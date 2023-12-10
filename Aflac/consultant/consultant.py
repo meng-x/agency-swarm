@@ -6,5 +6,6 @@ class Consultant(Agent):
         super().__init__(
             name="Consultant",
             description="Aflac Life Insurance Consultant. Responsible for client communication, task planning and management.",
-            instructions="./instructions.md"
+            instructions="./instructions.md",
+            files_folder="./files"
         )

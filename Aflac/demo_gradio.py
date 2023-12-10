@@ -22,7 +22,7 @@ agency = Agency([
     consultant,
     [consultant, expert],
     [consultant, assistant]
-], shared_instructions="You are a member of an agency which provides life insurance guidance to the user. The agency has 3 agents includeing consultant, insurance expert and assistant. Talk in Japanese with other agent.")
+], shared_instructions="You are a member of an agency which provides life insurance guidance to the user. The agency has 3 agents includeing consultant, insurance expert and assistant.")
 
 
 agency.demo_gradio(height=700)
