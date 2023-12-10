@@ -4,6 +4,11 @@ import uuid
 from enum import Enum
 from typing import List
 
+import gradio as gr
+import whisper
+import openai
+from openai import OpenAI
+
 from pydantic import Field, field_validator
 
 from agency_swarm.agents import Agent
@@ -116,6 +121,69 @@ class Agency:
 
         # Launch the demo
         demo.launch()
+    
+    def demo_gradio_voice(self, height=600):
+        with gr.Blocks() as demo:
+            chatbot = gr.Chatbot(height=height)
+            with gr.Row():
+                with gr.Column():
+                    voice_input = gr.Audio(label="質問を録音後、「送信」ボタンをクリックしてください", source="microphone", type="filepath")
+                with gr.Column():
+                    whisper_button = gr.Button("文字起こし（任意言語）")
+            msg = gr.Textbox(label="質問内容（任意言語）")
+            voice_output = gr.Audio(label="コンサルタントの発言を再生してください", source="microphone", type="filepath")
+
+            def convert_voice_to_text(file_path):
+                model = whisper.load_model("base")
+                result = model.transcribe(file_path)
+                return result["text"]
+
+            def text_to_voice(text):
+                client = OpenAI()
+                speech_file_path = "./speech.mp3"
+                response = client.audio.speech.create(
+                    model="tts-1",
+                    voice="nova", #onyx
+                    input=text
+                )
+                response.stream_to_file(speech_file_path)
+                return speech_file_path
+
+            def user(user_audio):
+                user_raw_text = convert_voice_to_text(user_audio)  # Convert voice to text
+                return None, user_raw_text
+            
+            def confirm(user_message, history):
+                user_text = "👤 User: " + user_message.strip()
+                return None, history + [[user_text, None]]
+
+            def bot(history):
+                gen = self.get_completion(message=history[-1][0])
+                try:
+                    for bot_message in gen:
+                        print("bot msg type:", bot_message.msg_type)
+                        if bot_message.sender_name.lower() == "user":
+                            continue
+                        if bot_message.msg_type.lower() == "function":
+                            continue
+                        message = bot_message.get_sender_emoji() + " " + bot_message.get_formatted_content()
+                        history.append((None, message))
+                        if bot_message.receiver_name.lower() == "user":
+                            voice_response = text_to_voice(message)  # Convert text response to voice
+                            print("TTS result", voice_response)
+                            yield history, voice_response
+                            continue
+                        yield history, None
+                except StopIteration:
+                    pass
+            whisper_button.click(user, voice_input, [voice_input, msg])
+            msg.submit(confirm, [msg, chatbot], [msg, chatbot]).then(
+                bot, [chatbot], [chatbot, voice_output]
+            )
+
+            demo.queue()
+
+        demo.launch(show_error=True, debug=True)
 
     def run_demo(self):
         """

@@ -167,3 +167,4 @@ tests/agency_manifesto.txt
 tests/settings.json
 
 .DS_Store
+*.mp3
