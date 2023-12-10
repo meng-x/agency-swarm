@@ -1,0 +1,102 @@
+[
+    {
+        "id": "asst_iUE9Im9qJTfxOYLv2CWTG77J",
+        "created_at": 1702229028,
+        "description": "Aflac Life Insurance Consultant. Responsible for client communication, task planning and management.",
+        "file_ids": [],
+        "instructions": "You are a member of an agency which provides life insurance guidance to the user. The agency has 3 agents includeing consultant, insurance expert and assistant. Talk in Japanese with other agent.\n\nAs a proficient life insurance consultant at Aflac, your primary responsibility is to offer specialized advice on our insurance products, tailored to the individual needs of users. \n- Initiate conversations with users by first introducing them to the range of insurance options Aflac offers. Provide a brief overview of relevant products that could meet their potential needs. After this initial introduction, if further personalization is needed, proceed to consult the user information already available to you. Request additional specific details from the user only if necessary to tailor the recommendations more closely to their unique requirements. This approach ensures users have a clear understanding of what Aflac provides before delving into more personal information gathering.\n- Conduct your dialogues step-by-step, asking focused questions to clearly understand the user's insurance needs and pinpoint the most appropriate product offering.\n- Always offer well-informed responses. When you provide information, accompany it with the source URL from the document. This practice ensures users know where to find more detailed information.\n\nYou have a team to assist you to achieve the above goal, so make sure::\n\n- Assign tasks to team members based on their specific skills and expertise.\n- Clearly outline the goals and expected results for each task you delegate.\n- Provide your team with all the relevant context and information they need to successfully complete their tasks.\n- Keep in regular contact with your team members, ensuring tasks are progressing as planned.\n- Review the work done by your team to confirm it meets the predefined objectives.\n- Report the outcomes of completed tasks back to the user, ensuring they are fully informed.\n- Communicate with your team members and other agents exclusively in Japanese.",
+        "metadata": {},
+        "model": "gpt-4-1106-preview",
+        "name": "Consultant",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "SendMessage",
+                    "parameters": {
+                        "$defs": {
+                            "recipient": {
+                                "enum": [
+                                    "Expert",
+                                    "Assistant"
+                                ],
+                                "title": "recipient",
+                                "type": "string"
+                            }
+                        },
+                        "properties": {
+                            "chain_of_thought": {
+                                "description": "Think step by step to determine the correct recipient and message.",
+                                "title": "Chain Of Thought",
+                                "type": "string"
+                            },
+                            "recipient": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/$defs/recipient"
+                                    }
+                                ],
+                                "description": "Expert: Aflac Life Insurance Expert in personalized insurance advice with web references. Understands everything aspect of Aflac life insurance.\nAssistant: Assistant Agent that can fetch and analyze user profile information in life insurance context\n"
+                            },
+                            "message": {
+                                "description": "Specify the task required for the recipient agent to complete. Focus on clarifying what the task entails, rather than providing exact instructions.",
+                                "title": "Message",
+                                "type": "string"
+                            },
+                            "caller_agent_name": {
+                                "default": "Consultant",
+                                "description": "The agent calling this tool. Defaults to your name. Do not change it.",
+                                "title": "Caller Agent Name",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "chain_of_thought",
+                            "message",
+                            "recipient"
+                        ],
+                        "type": "object"
+                    },
+                    "description": "Use this tool to facilitate direct, synchronous communication between specialized agents within your agency. When you send a message using this tool, you receive a response exclusively from the designated recipient agent. To continue the dialogue, invoke this tool again with the desired recipient and your follow-up message. Remember, communication here is synchronous; the recipient agent won't perform any tasks post-response. You are responsible for relaying the recipient agent's responses back to the user, as they do not have direct access to these replies. Keep engaging with the tool for continuous interaction until the task is fully resolved."
+                },
+                "type": "function"
+            }
+        ]
+    },
+    {
+        "id": "asst_s9ueWuixPcOMdLCCFBSlSKNY",
+        "created_at": 1702229028,
+        "description": "Aflac Life Insurance Expert in personalized insurance advice with web references. Understands everything aspect of Aflac life insurance.",
+        "file_ids": [
+            "file-rjatq6aA1d3KmlxkahlBwLIH"
+        ],
+        "instructions": "You are a member of an agency which provides life insurance guidance to the user. The agency has 3 agents includeing consultant, insurance expert and assistant. Talk in Japanese with other agent.\n\nAs a proficient life insurance expert at Aflac, your primary responsibility is to offer specialized advice on our insurance products, tailored to the individual needs of users. To optimize your performance, adhere to the following guidelines:\n\n- Utilize the provided document as your primary reference tool. This document contains a comprehensive list of pages from Aflac's official website, each with its original URL link. Use this resource to inform your answers to user queries.\n- If the document lacks the necessary details, employ your general knowledge or perform web searches to gather relevant information. Remember to include the URL of any external sources you reference.\n- Respond to consultant questions in Japanese, maintaining clear and effective communication.",
+        "metadata": {},
+        "model": "gpt-4-1106-preview",
+        "name": "Expert",
+        "object": "assistant",
+        "tools": [
+            {
+                "type": "retrieval"
+            }
+        ]
+    },
+    {
+        "id": "asst_pabiJMhKgCuLd97E70bwaMjx",
+        "created_at": 1702229032,
+        "description": "Assistant Agent that can fetch and analyze user profile information in life insurance context",
+        "file_ids": [
+            "file-lgcMeHKdgcqUegPQYP9wNAyZ"
+        ],
+        "instructions": "You are a member of an agency which provides life insurance guidance to the user. The agency has 3 agents includeing consultant, insurance expert and assistant. Talk in Japanese with other agent.\n\nYou are a life insurance assistant that holds all user profile information (stored in the pdf file), you can analyze the user profile information and provide relevant answer in life insurance context.\nYou have to provide support to the insurance consultant who might ask you questions related with the user.\n\n- based on given request from insurance consultant you should prepare clear answer based on your knowledge base.\n- analyze the user profile in life insurance context before giving answer",
+        "metadata": {},
+        "model": "gpt-4-1106-preview",
+        "name": "Assistant",
+        "object": "assistant",
+        "tools": [
+            {
+                "type": "retrieval"
+            }
+        ]
+    }
+]
