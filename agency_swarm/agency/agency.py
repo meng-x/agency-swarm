@@ -124,6 +124,7 @@ class Agency:
     
     def demo_gradio_voice(self, height=600):
         with gr.Blocks() as demo:
+            gr.Markdown("""<h2><center>Aflac保険・AIコンサルDemo</center></h2>""")
             chatbot = gr.Chatbot(height=height)
             with gr.Row():
                 with gr.Column():
@@ -151,6 +152,7 @@ class Agency:
 
             def user(user_audio):
                 user_raw_text = convert_voice_to_text(user_audio)  # Convert voice to text
+                user_raw_text = user_raw_text.replace("保健", "保険")
                 return None, user_raw_text
             
             def confirm(user_message, history):
@@ -161,29 +163,38 @@ class Agency:
                 gen = self.get_completion(message=history[-1][0])
                 try:
                     for bot_message in gen:
-                        print("bot msg type:", bot_message.msg_type)
+                        print(bot_message.msg_type.upper(), ":", bot_message.sender_name, "->", bot_message.receiver_name, "|", bot_message.content)
                         if bot_message.sender_name.lower() == "user":
                             continue
-                        if bot_message.msg_type.lower() == "function":
-                            continue
+                        # if bot_message.msg_type.lower() == "function":
+                        #     continue
                         message = bot_message.get_sender_emoji() + " " + bot_message.get_formatted_content()
                         history.append((None, message))
-                        if bot_message.receiver_name.lower() == "user":
-                            voice_response = text_to_voice(message)  # Convert text response to voice
-                            print("TTS result", voice_response)
-                            yield history, voice_response
-                            continue
-                        yield history, None
+                        # if bot_message.receiver_name.lower() == "user":
+                        #     voice_response = text_to_voice(message)  # Convert text response to voice
+                        #     print("TTS result", voice_response)
+                        #     yield history, voice_response
+                        #     continue
+                        yield history
                 except StopIteration:
                     pass
+                
+            def tts(history):
+                # print("History:", history)
+                user_response = history[-1][1]
+                print("prepare TTS:", user_response)
+                voice_response = text_to_voice(user_response.split(":")[1])  # Convert text response to voice
+                print("TTS result", voice_response)
+                return history, voice_response
+            
             whisper_button.click(user, voice_input, [voice_input, msg])
             msg.submit(confirm, [msg, chatbot], [msg, chatbot]).then(
-                bot, [chatbot], [chatbot, voice_output]
-            )
+                bot, [chatbot], [chatbot]
+            ).then(tts, [chatbot], [chatbot, voice_output])
 
             demo.queue()
 
-        demo.launch(show_error=True, debug=True)
+        demo.launch(show_error=True, debug=True) #share=True
 
     def run_demo(self):
         """
