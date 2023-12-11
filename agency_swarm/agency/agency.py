@@ -163,7 +163,7 @@ class Agency:
                 gen = self.get_completion(message=history[-1][0])
                 try:
                     for bot_message in gen:
-                        print(bot_message.msg_type.upper(), ":", bot_message.sender_name, "->", bot_message.receiver_name, "|", bot_message.content)
+                        # print(bot_message.msg_type.upper(), ":", bot_message.sender_name, "->", bot_message.receiver_name, "|", bot_message.content)
                         if bot_message.sender_name.lower() == "user":
                             continue
                         # if bot_message.msg_type.lower() == "function":
@@ -182,7 +182,7 @@ class Agency:
             def tts(history):
                 # print("History:", history)
                 user_response = history[-1][1]
-                print("prepare TTS:", user_response)
+                # print("prepare TTS:", user_response)
                 voice_response = text_to_voice(user_response.split(":")[1])  # Convert text response to voice
                 print("TTS result", voice_response)
                 return history, voice_response
